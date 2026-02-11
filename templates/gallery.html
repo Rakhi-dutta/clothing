@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-3">Gallery – {{ item.name }}</h3>
+
+<div class="card shadow-sm p-4 mb-4">
+    <h5 class="fw-semibold mb-3">Add Gallery Images</h5>
+    <form method="POST" action="{{ url_for('item_gallery_add', item_id=item.id) }}"
+          enctype="multipart/form-data" class="row g-3">
+        <div class="col-md-8">
+            <input type="file" name="gallery" class="form-control"
+                   accept="image/*" multiple required>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary w-100">Upload</button>
+        </div>
+    </form>
+</div>
+
+<div class="card shadow-sm p-4">
+    <h5 class="fw-semibold mb-3">Existing Images</h5>
+
+    {% if images %}
+    <div class="row g-3">
+        {% for img in images %}
+        <div class="col-md-3">
+            <div class="border rounded p-2 text-center">
+                <img src="/uploads/{{ img.image }}" class="img-fluid rounded mb-2">
+                <a href="{{ url_for('item_gallery_delete', img_id=img.id) }}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Delete this image?');">
+                    Delete
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No gallery images yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

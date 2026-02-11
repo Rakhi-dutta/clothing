@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">⚙ Settings</h4>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="mb-3">General Settings</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Theme</strong></label>
+                    <div class="d-flex align-items-center gap-3">
+                        <button id="settingsThemeToggle" class="btn btn-sm btn-dark">
+                            🌙 Current Theme: Light
+                        </button>
+                        <small class="text-muted">Use the button in the top navbar to toggle between light and dark mode.</small>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3">Security</h5>
+                
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label"><strong>Current Password</strong></label>
+                    <input type="password" class="form-control" id="currentPassword" placeholder="Enter your current password">
+                </div>
+
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label"><strong>New Password</strong></label>
+                    <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label"><strong>Confirm New Password</strong></label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+
+                <button type="button" class="btn btn-warning" id="changePasswordBtn">
+                    <i class="bi bi-lock"></i> Change Password
+                </button>
+
+                <hr>
+
+                <h5 class="mb-3">Account</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Username</strong></label>
+                    <input type="text" class="form-control" value="{{ session['admin'] }}" disabled>
+                    <small class="text-muted">Contact an administrator to change your username.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="userRole" class="form-label"><strong>Role</strong></label>
+                    <input type="text" class="form-control" id="userRole" value="{{ session['role'] | title }}" disabled>
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3">Preferences</h5>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="autoRefresh" checked disabled>
+                    <label class="form-check-label" for="autoRefresh">
+                        Auto-refresh inventory data
+                    </label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="notifications" checked disabled>
+                    <label class="form-check-label" for="notifications">
+                        Show notifications
+                    </label>
+                </div>
+
+                <hr>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                        <i class="bi bi-person-circle"></i> Back to Profile
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const themeBtn = document.getElementById('settingsThemeToggle');
+    const stored = localStorage.getItem('theme') || 'light';
+    
+    function updateThemeLabel() {
+        const current = localStorage.getItem('theme') || 'light';
+        if (current === 'dark') {
+            themeBtn.textContent = "☀ Current Theme: Dark";
+            themeBtn.classList.remove('btn-dark');
+            themeBtn.classList.add('btn-warning');
+        } else {
+            themeBtn.textContent = "🌙 Current Theme: Light";
+            themeBtn.classList.add('btn-dark');
+            themeBtn.classList.remove('btn-warning');
+        }
+    }
+    
+    updateThemeLabel();
+    
+    themeBtn.addEventListener('click', () => {
+        const next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        document.body.classList.toggle('dark-mode');
+        updateThemeLabel();
+    });
+
+    // Change Password
+    document.getElementById('changePasswordBtn').addEventListener('click', () => {
+        const current = document.getElementById('currentPassword').value;
+        const newPwd = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (!current || !newPwd || !confirm) {
+            alert('❌ Please fill all password fields.');
+            return;
+        }
+
+        if (newPwd !== confirm) {
+            alert('❌ New passwords do not match.');
+            return;
+        }
+
+        if (newPwd.length < 6) {
+            alert('❌ Password must be at least 6 characters long.');
+            return;
+        }
+
+        // Send to backend
+        fetch('{{ url_for("change_password") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_password: current,
+                new_password: newPwd
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.message);
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            } else {
+                alert('❌ ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ An error occurred. Please try again.');
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-4">Dashboard</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h6 class="text-muted">Total Products</h6>
+            <h3 class="fw-bold">{{ total_items }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h6 class="text-muted">Total Qty in Stock</h6>
+            <h3 class="fw-bold">{{ total_qty }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h6 class="text-muted">Total Categories</h6>
+            <h3 class="fw-bold">{{ category_count }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h6 class="text-muted">Low Stock Items (&lt; 5)</h6>
+            <h3 class="fw-bold text-danger">{{ low_stock }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card shadow-sm p-3">
+            <h6 class="fw-semibold mb-2">Category wise Quantity</h6>
+            <canvas id="catChart" height="120"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h6 class="fw-semibold mb-2">Recent Activity</h6>
+            <ul class="list-group list-group-flush">
+                {% for log in logs %}
+                <li class="list-group-item small" style="background:transparent;">
+                    <b>{{ log.action }}</b> — {{ log.details }}<br>
+                    <span class="text-muted">{{ log.created_at }}</span>
+                </li>
+                {% else %}
+                <li class="list-group-item small text-muted" style="background:transparent;">
+                    No logs yet.
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('catChart');
+const labels = {{ chart_labels | tojson }};
+const dataVals = {{ chart_values | tojson }};
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Quantity',
+            data: dataVals
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-3">Stock Movement Logs</h3>
+
+<div class="card shadow-sm p-3">
+    <table class="table table-hover table-bordered align-middle text-center">
+        <thead class="table-primary">
+            <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Qty Change</th>
+                <th>Note</th>
+                <th>By</th>
+                <th>At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in logs %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row.name or 'Deleted Item #' ~ row.clothing_id }}</td>
+                <td>{{ row.category or '-' }}</td>
+                <td>
+                    {% if row.change_type == 'in' %}
+                        <span class="badge bg-success">IN</span>
+                    {% elif row.change_type == 'out' %}
+                        <span class="badge bg-danger">OUT</span>
+                    {% elif row.change_type == 'adjust' %}
+                        <span class="badge bg-warning text-dark">ADJUST</span>
+                    {% elif row.change_type == 'create' %}
+                        <span class="badge bg-primary">CREATE</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ row.change_type }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.qty_change }}</td>
+                <td>{{ row.note }}</td>
+                <td>{{ row.admin }}</td>
+                <td>{{ row.created_at }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-muted">No stock logs yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">👤 My Profile</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label class="form-label"><strong>Username</strong></label>
+                    <input type="text" class="form-control" value="{{ session['admin'] }}" disabled>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Role</strong></label>
+                    <input type="text" class="form-control" value="{{ session['role'] | title }}" disabled>
+                </div>
+
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> Your account information is displayed above.
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('settings') }}" class="btn btn-secondary">
+                        <i class="bi bi-gear"></i> Go to Settings
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

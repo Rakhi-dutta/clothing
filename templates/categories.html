@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-4">Manage Categories</h3>
+
+<!-- ================= ADD CATEGORY ================= -->
+<div class="card shadow-sm p-4 mb-4">
+    <h5 class="fw-semibold mb-3">Add New Category</h5>
+
+    <form method="POST" action="{{ url_for('add_category') }}" class="row g-3">
+        <div class="col-md-4">
+            <input name="name" class="form-control" placeholder="Category name" required>
+        </div>
+
+        <div class="col-md-6">
+            <input name="description" class="form-control" placeholder="Optional description">
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Add Category</button>
+        </div>
+    </form>
+</div>
+
+<!-- ================= CATEGORY LIST + FILTERS ================= -->
+<div class="card shadow-sm p-4 mb-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h5 class="fw-semibold mb-0">
+            Category List  
+            <span class="text-muted small">({{ count }} items)</span>
+        </h5>
+    </div>
+
+    <!-- FILTERS -->
+    <form method="get" class="row gy-3 gx-3 mb-3">
+
+        <!-- Search -->
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text"
+                       name="q"
+                       value="{{ q or '' }}"
+                       class="form-control"
+                       placeholder="Search category or description...">
+            </div>
+        </div>
+
+        <!-- Sorting -->
+        <div class="col-md-3">
+            <select name="sort" class="form-select">
+                <option value="name_asc"  {% if sort=='name_asc' %}selected{% endif %}>Name A → Z</option>
+                <option value="name_desc" {% if sort=='name_desc' %}selected{% endif %}>Name Z → A</option>
+                <option value="created_desc" {% if sort=='created_desc' %}selected{% endif %}>Newest First</option>
+                <option value="created_asc" {% if sort=='created_asc' %}selected{% endif %}>Oldest First</option>
+            </select>
+        </div>
+
+        <!-- Per Page -->
+        <div class="col-md-2">
+            <select name="per_page" class="form-select">
+                <option value="5"  {% if per_page==5  %}selected{% endif %}>5 rows</option>
+                <option value="10" {% if per_page==10 %}selected{% endif %}>10 rows</option>
+                <option value="20" {% if per_page==20 %}selected{% endif %}>20 rows</option>
+                <option value="50" {% if per_page==50 %}selected{% endif %}>50 rows</option>
+            </select>
+        </div>
+
+        <!-- Apply + Reset -->
+        <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-primary flex-grow-1">Apply</button>
+            <a href="{{ url_for('categories') }}"
+               class="btn btn-outline-secondary flex-grow-1">Reset</a>
+        </div>
+
+    </form>
+
+    <!-- TABLE -->
+    <table class="table table-hover table-bordered text-center align-middle">
+        <thead class="table-primary">
+            <tr>
+                <th width="60">#</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th width="150">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for c in cats %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td class="fw-bold text-start">{{ c.name }}</td>
+                <td class="text-start">{{ c.description or "-" }}</td>
+
+                <td>
+                    <div class="d-flex justify-content-center gap-2">
+
+                        <!-- EDIT -->
+                        <button class="action-btn btn-edit"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal{{ c.id }}"
+                                title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <!-- DELETE -->
+                        <button class="action-btn btn-delete"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ c.id }}"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                    </div>
+                </td>
+            </tr>
+
+            <!-- EDIT MODAL -->
+            <div class="modal fade" id="editModal{{ c.id }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <form method="POST" action="{{ url_for('edit_category', cat_id=c.id) }}">
+                            <div class="modal-header bg-primary text-white">
+                                <h5>Edit Category</h5>
+                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <label class="form-label fw-semibold">Category Name</label>
+                                <input name="name" value="{{ c.name }}"
+                                       class="form-control mb-3" required>
+
+                                <label class="form-label fw-semibold">Description</label>
+                                <input name="description" value="{{ c.description }}" class="form-control">
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-success">Save</button>
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DELETE MODAL -->
+            <div class="modal fade" id="deleteModal{{ c.id }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header bg-danger text-white">
+                            <h5>Delete Category</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Are you sure you want to delete <b>{{ c.name }}</b>?
+                        </div>
+
+                        <div class="modal-footer">
+                            <a href="{{ url_for('delete_category', cat_id=c.id) }}"
+                               class="btn btn-danger">Delete</a>
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+   <!-- ================= PAGINATION ================= -->  
+{% if pages %}
+<!-- <div class="d-flex justify-content-center mt-4"> -->
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center gap-1">
+
+            <!-- Prev -->
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link rounded-pill px-3"
+                   href="{{ url_for('categories', q=q, sort=sort, per_page=per_page, page=page-1) }}">
+                    « Prev
+                </a>
+            </li>
+
+            <!-- Page numbers -->
+            {% for p in pages %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link rounded-pill px-3"
+                   href="{{ url_for('categories', q=q, sort=sort, per_page=per_page, page=p) }}">
+                    {{ p }}
+                </a>
+            </li>
+            {% endfor %}
+
+            <!-- Next -->
+            <li class="page-item {% if page == pages|length %}disabled{% endif %}">
+                <a class="page-link rounded-pill px-3"
+                   href="{{ url_for('categories', q=q, sort=sort, per_page=per_page, page=page+1) }}">
+                    Next »
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+<!-- </div> -->
+ {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-4">Edit Item</h3>
+
+<div class="card shadow-sm p-4">
+    <form action="{{ url_for('update_item', item_id=item.id) }}"
+          method="POST" enctype="multipart/form-data" class="row g-3">
+
+        <div class="col-md-3">
+            <label class="form-label">Name</label>
+            <input name="name" class="form-control" value="{{ item.name }}" required>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select" required>
+                <option value="">Select Category</option>
+                {% for c in categories %}
+                <option value="{{ c.name }}"
+                        {% if c.name == item.category %}selected{% endif %}>
+                    {{ c.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Size</label>
+            <input name="size" class="form-control" value="{{ item.size }}" required>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Quantity</label>
+            <input name="quantity" type="number" class="form-control"
+                   value="{{ item.quantity }}" required>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Price (₹)</label>
+            <input name="price" type="number" step="0.01" class="form-control"
+                   value="{{ item.price }}" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Product Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+            <small class="text-muted d-block mt-1">
+                Leave empty to keep existing image.
+            </small>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            {% if item.image %}
+                <img src="/uploads/{{ item.image }}" width="80"
+                     class="rounded shadow-sm border">
+            {% else %}
+                <span class="text-muted">No image uploaded.</span>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4 d-flex flex-column justify-content-end">
+            {% if item.barcode %}
+                <a class="btn btn-outline-secondary btn-sm mb-2"
+                   href="/uploads/{{ item.barcode }}" target="_blank">
+                    🧾 View Barcode
+                </a>
+            {% endif %}
+            {% if item.qrcode %}
+                <a class="btn btn-outline-success btn-sm"
+                   href="/uploads/{{ item.qrcode }}" target="_blank">
+                    🔳 View QR Code
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="col-12 mt-3">
+            <button class="btn btn-primary">
+                💾 Save Changes
+            </button>
+            <a href="{{ url_for('inventory') }}"
+               class="btn btn-outline-secondary ms-2">
+                ✖ Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-3">Activity Logs</h3>
+
+<div class="card shadow-sm p-3">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-primary">
+            <tr>
+                <th>#</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in logs %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.action }}</td>
+                <td>{{ row.details }}</td>
+                <td>{{ row.created_at }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted">No logs yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
