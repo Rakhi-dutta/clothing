@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('shop') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-bag"></i> Shop
+        </a>
+        <a href="{{ url_for('view_cart') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-cart"></i> Cart
+        </a>
+    </div>
+    <a href="{{ url_for('login') }}" class="btn btn-link btn-sm text-decoration-none">Admin Login</a>
+</div>
+
+{% if not cart_items or cart_items|length == 0 %}
+<div class="alert alert-info">
+    Your cart is empty. <a href="{{ url_for('shop') }}">Go to shop</a>.
+</div>
+{% else %}
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card shadow-sm p-4">
+            <h4 class="fw-bold mb-3">Checkout</h4>
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Name *</label>
+                        <input class="form-control" name="name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email *</label>
+                        <input class="form-control" name="email" type="email" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input class="form-control" name="phone">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Zip Code *</label>
+                        <input class="form-control" name="zip_code" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Address *</label>
+                        <input class="form-control" name="address" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">City *</label>
+                        <input class="form-control" name="city" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">State *</label>
+                        <input class="form-control" name="state" required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{{ url_for('view_cart') }}" class="btn btn-outline-secondary">Back to Cart</a>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-bag-check"></i> Place Order
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm p-4">
+            <h5 class="fw-semibold mb-3">Order Summary</h5>
+            <ul class="list-group list-group-flush">
+                {% for it in cart_items %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="background:transparent;">
+                    <div>
+                        <div class="fw-semibold">{{ it.name }}</div>
+                        <div class="text-muted small">Size: {{ it.size }} • Qty: {{ it.quantity }}</div>
+                    </div>
+                    <div class="fw-semibold">₹ {{ '%.2f'|format(it.price * it.quantity) }}</div>
+                </li>
+                {% endfor %}
+            </ul>
+            <hr>
+            <div class="d-flex justify-content-between">
+                <div class="fw-bold">Total</div>
+                <div class="fw-bold">₹ {{ '%.2f'|format(total) }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+

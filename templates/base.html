@@ -222,6 +222,15 @@
            href="{{ url_for('stock_logs') }}">📈 Stock Logs</a>
 
         {% if session.get('role') in ['admin','superadmin'] %}
+        <a class="nav-link {% if request.path.startswith('/admin/orders') %}active{% endif %}"
+           href="{{ url_for('admin_orders') }}"><i class="bi bi-receipt"></i> Orders</a>
+
+        <a class="nav-link {% if request.path.startswith('/admin/customers') %}active{% endif %}"
+           href="{{ url_for('admin_customers') }}"><i class="bi bi-people"></i> Customers</a>
+
+        <a class="nav-link {% if request.path.startswith('/admin/notifications') %}active{% endif %}"
+           href="{{ url_for('admin_notifications') }}"><i class="bi bi-bell"></i> Notifications</a>
+
         <a class="nav-link {% if request.path.startswith('/logs') %}active{% endif %}"
            href="{{ url_for('logs') }}">🕒 Activity Logs</a>
         {% endif %}
@@ -303,18 +312,24 @@
     function applyTheme(t) {
         if (t === 'dark') {
             document.body.classList.add('dark-mode');
-            toggleBtn.textContent = "☀ Light Mode";
-            toggleBtn.classList.remove('btn-dark');
-            toggleBtn.classList.add('btn-warning');
+            if (toggleBtn) {
+                toggleBtn.textContent = "☀ Light Mode";
+                toggleBtn.classList.remove('btn-dark');
+                toggleBtn.classList.add('btn-warning');
+            }
         } else {
             document.body.classList.remove('dark-mode');
-            toggleBtn.textContent = "🌙 Dark Mode";
-            toggleBtn.classList.add('btn-dark');
-            toggleBtn.classList.remove('btn-warning');
+            if (toggleBtn) {
+                toggleBtn.textContent = "🌙 Dark Mode";
+                toggleBtn.classList.add('btn-dark');
+                toggleBtn.classList.remove('btn-warning');
+            }
         }
     }
 
     applyTheme(stored);
+
+    if (!toggleBtn) return;
 
     toggleBtn.addEventListener('click', () => {
         const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';

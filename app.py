@@ -226,6 +226,13 @@ def require_role(*roles):
     return decorator
 
 
+# ---------------- CUSTOMER/ECOM ROUTES ----------------
+# Registers /shop, /cart, /checkout, and admin order/customer/notification screens.
+from customer_routes import register_customer_routes
+
+register_customer_routes(app, get_db, log_action, require_login, require_role)
+
+
 # ---------------- ROOT ----------------
 @app.route("/")
 def root():

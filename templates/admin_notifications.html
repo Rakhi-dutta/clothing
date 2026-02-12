@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h3 class="fw-bold mb-0">Notifications</h3>
+    <div class="badge bg-warning text-dark">Unread: {{ unread_count }}</div>
+</div>
+
+<div class="card shadow-sm p-4">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th style="width:160px;">Created</th>
+                    <th>Title</th>
+                    <th>Message</th>
+                    <th style="width:110px;">Status</th>
+                    <th style="width:110px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for n in notifications %}
+                <tr>
+                    <td class="text-muted small">{{ n.created_at }}</td>
+                    <td class="fw-semibold">{{ n.title }}</td>
+                    <td>
+                        <div>{{ n.message }}</div>
+                        {% if n.order_id %}
+                        <a class="small text-decoration-none" href="{{ url_for('admin_order_detail', order_id=n.order_id) }}">
+                            View order
+                        </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if n.read %}
+                        <span class="badge bg-success">Read</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Unread</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not n.read %}
+                        <button class="btn btn-sm btn-outline-primary" onclick="markRead({{ n.id }})">
+                            <i class="bi bi-check2"></i>
+                        </button>
+                        {% else %}
+                        <span class="text-muted small">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-muted">No notifications.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pages|length > 1 %}
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center flex-wrap">
+            {% for pnum in pages %}
+            <li class="page-item {% if pnum==page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('admin_notifications', page=pnum) }}">{{ pnum }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<script>
+function markRead(id) {
+    fetch(`/notification/${id}/read`)
+        .then(r => r.json())
+        .then(() => window.location.reload())
+        .catch(() => window.location.reload());
+}
+</script>
+
+{% endblock %}
+
